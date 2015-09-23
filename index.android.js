@@ -1,12 +1,10 @@
-var { requireNativeComponent } = require('react-native');
+var { requireNativeComponent, PropTypes } = require('react-native');
 
-var iface = {
-  name: 'ImageView',
-  propTypes: {
-    src: PropTypes.string,
-    borderRadius: PropTypes.number,
-    resizeMode: PropTypes.oneOf(['cover', 'contain', 'stretch']),
-  },
+var ReactCameraView = {
+    name: 'ReactCameraView',
+    propTypes: {
+        placeholderprop: PropTypes.string
+    }
 };
 
-module.exports = requireNativeComponent('RCTCamera', iface);
+module.exports = requireNativeComponent('ReactCameraView', ReactCameraView);
