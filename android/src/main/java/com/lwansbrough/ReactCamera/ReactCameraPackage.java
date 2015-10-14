@@ -12,7 +12,9 @@ public class ReactCameraPackage implements ReactPackage {
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList();
+        List<NativeModule> modules = new ArrayList<NativeModule>();
+        modules.add(new ReactCameraModule(reactContext));
+        return modules;
     }
 
     @Override
