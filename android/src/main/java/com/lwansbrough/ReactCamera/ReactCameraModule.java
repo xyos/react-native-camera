@@ -43,12 +43,8 @@ public class ReactCameraModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            // http://stackoverflow.com/questions/9224056/android-bitmap-to-base64-string
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-            String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            camera.startPreview();
+            String encoded = Base64.encodeToString(data, Base64.DEFAULT);
             callback.invoke(encoded);
         }
     }
