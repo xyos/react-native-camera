@@ -1,10 +1,31 @@
-var { requireNativeComponent, PropTypes } = require('react-native');
+var React = require('react-native');
+var { requireNativeComponent, PropTypes, NativeModules } = React;
 
-var ReactCameraView = {
+var ReactNativeCameraModule = NativeModules.ReactCameraModule;
+var ReactCameraView = requireNativeComponent('ReactCameraView', {
     name: 'ReactCameraView',
     propTypes: {
         placeholderprop: PropTypes.string
     }
-};
+});
 
-module.exports = requireNativeComponent('ReactCameraView', ReactCameraView);
+var ReactCameraViewWrapper = React.createClass({
+
+    render () {
+        return (
+            <ReactCameraView {...this.props}></ReactCameraView>
+        );
+    },
+
+    capture (options, callback) {
+        return new Promise(function(resolve, reject) {
+            if (!callback && typeof options === 'function') callback = options;
+            ReactNativeCameraModule.capture(function(encoded) {
+                if (typeof callback === 'function') callback(encoded);
+                resolve(encoded);
+            });
+        });
+    }
+});
+
+module.exports = ReactCameraViewWrapper;
