@@ -18,6 +18,7 @@ class ReactCameraView extends SurfaceView implements SurfaceHolder.Callback {
     public ReactCameraView(ThemedReactContext context, Camera cm) {
         super(context);
         Helper.setCamera(camera);
+        camera = cm;
         Camera.Parameters params = camera.getParameters();
         List<String> focusModes = params.getSupportedFocusModes();
         if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
