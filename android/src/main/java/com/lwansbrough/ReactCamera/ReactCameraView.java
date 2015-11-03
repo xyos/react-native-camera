@@ -1,32 +1,32 @@
 package com.lwansbrough.ReactCamera;
 
-import android.content.Context;
-import android.view.View;
+import android.content.res.Configuration;
+import android.hardware.Camera;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
-import com.facebook.react.bridge.NativeModule;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.uimanager.ThemedReactContext;
 
-import android.view.SurfaceView;
-import android.view.SurfaceHolder;
-import android.hardware.Camera;
 import java.io.IOException;
-import android.app.Activity;
+import java.util.List;
 
 class ReactCameraView extends SurfaceView implements SurfaceHolder.Callback {
-    SurfaceHolder surfaceHolder;
-    Camera camera;
+    private SurfaceHolder surfaceHolder;
+    private Camera camera;
     ThemedReactContext context;
 
-    public ReactCameraView(ThemedReactContext context, Camera camera) {
+    public ReactCameraView(ThemedReactContext context, Camera cm) {
         super(context);
         Helper.setCamera(camera);
-        this.camera = camera;
-        this.surfaceHolder = getHolder();
-        this.surfaceHolder.addCallback(this);
+        Camera.Parameters params = camera.getParameters();
+        List<String> focusModes = params.getSupportedFocusModes();
+        if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            camera.setParameters(params);
+        }
+        camera = cm;
+        surfaceHolder = getHolder();
+        surfaceHolder.addCallback(this);
     }
 
     public void maybeUpdateView() {
@@ -35,20 +35,36 @@ class ReactCameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void surfaceCreated(SurfaceHolder holder) {
         try {
-            this.camera.setPreviewDisplay(this.surfaceHolder);
-            this.camera.setDisplayOrientation(90);
+            camera.setPreviewDisplay(holder);
             this.camera.startPreview();
         } catch(IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        this.camera.stopPreview();
-        this.camera.release();
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int heigth) {
+        if(holder.getSurface() == null){return;}
+        try{
+            this.camera.stopPreview();
+        } catch (Exception e) {
+
+        }
+        if(getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_PORTRAIT){
+            camera.setDisplayOrientation(90);
+        }
+        try {
+            camera.setPreviewDisplay(surfaceHolder);
+            camera.startPreview();
+        } catch (Exception e){
+
+        }
     }
 
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        //TODO handle rotation etc
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        if (camera != null) {
+            camera.stopPreview();
+        }
     }
 }
